@@ -11,6 +11,13 @@ on:
         required: false
         type: string
         default: 'Dockerfile'
+    secrets:
+      REG_USER:
+        type: string
+        required: false
+      REG_PASS:
+        type: string
+        required: false
 
 jobs:
   docker:
@@ -40,10 +47,21 @@ jobs:
             0
 
       - name: Push to GHCR
+        if: inputs.registry == 'ghcr.io'
         uses: redhat-actions/push-to-registry@v2.7
         with:
           image: ${{ steps.build-image.outputs.image }}
           registry: ${{ inputs.registry }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          tags: ${{ steps.tags.outputs.tags }}
+
+      - name: Push to Registry
+        if: inputs.registry != 'ghcr.io'
+        uses: redhat-actions/push-to-registry@v2.7
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          registry: ${{ inputs.registry }}
+          username: ${{ secrets.REG_USER }}
+          password: ${{ secrets.REG_PASS }}
           tags: ${{ steps.tags.outputs.tags }}
