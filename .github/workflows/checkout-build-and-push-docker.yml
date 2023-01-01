@@ -19,6 +19,10 @@ on:
         required: false
         type: string
         default: ''
+      prelogin:
+        required: false
+        type: boolean
+        default: false
     secrets:
       REGISTRY_USER:
         required: false
@@ -40,6 +44,24 @@ jobs:
           separator: ' '
           fullname: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pre-login GHCR
+        if: inputs.registry == 'ghcr.io'
+        id: pre-login
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASS }}
+
+      - name: Pre-login Registry
+        if: inputs.registry != 'ghcr.io'
+        id: pre-login
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Build image
         id: build-image
