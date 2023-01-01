@@ -12,9 +12,9 @@ on:
         type: string
         default: 'Dockerfile'
     secrets:
-      REG_USER:
+      REGISTRY_USER:
         required: false
-      REG_PASS:
+      REGISTRY_PASS:
         required: false
 
 jobs:
@@ -60,6 +60,6 @@ jobs:
         with:
           image: ${{ steps.build-image.outputs.image }}
           registry: ${{ inputs.registry }}
-          username: ${{ secrets.REG_USER }}
-          password: ${{ secrets.REG_PASS }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASS }}
           tags: ${{ steps.tags.outputs.tags }}
