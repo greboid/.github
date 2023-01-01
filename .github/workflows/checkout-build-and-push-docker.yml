@@ -5,11 +5,9 @@ on:
     inputs:
       registry:
         required: false
-        type: string
         default: 'ghcr.io'
       dockerfile:
         required: false
-        type: string
         default: 'Dockerfile'
 
 jobs:
