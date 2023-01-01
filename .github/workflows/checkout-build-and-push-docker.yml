@@ -51,8 +51,8 @@ jobs:
         uses: redhat-actions/podman-login@v1
         with:
           registry: ${{ inputs.registry }}
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_PASS }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Pre-login Registry
         if: inputs.registry != 'ghcr.io'
@@ -60,8 +60,8 @@ jobs:
         uses: redhat-actions/podman-login@v1
         with:
           registry: ${{ inputs.registry }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASS }}
 
       - name: Build image
         id: build-image
