@@ -50,7 +50,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pre-login GHCR
-        if: preloginghcr
+        if: ${{ inputs.preloginghcr }}
         id: pre-login-ghcr
         uses: redhat-actions/podman-login@v1
         with:
@@ -59,7 +59,7 @@ jobs:
           password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Pre-login Registry
-        if: preloginreg
+        if: ${{ inputs.preloginreg }}
         id: pre-login-registry
         uses: redhat-actions/podman-login@v1
         with:
