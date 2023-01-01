@@ -11,6 +11,10 @@ on:
         required: false
         type: string
         default: 'Dockerfile'
+      image:
+        required: false
+        type: string
+        default: ${{ github.repository }}
     secrets:
       REGISTRY_USER:
         required: false
@@ -38,7 +42,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2.11
         with:
           dockerfiles: ${{ inputs.dockerfile }}
-          image: ${{ github.repository }}
+          image: ${{ inputs.image }}
           tags: ${{ steps.tags.outputs.tags }}
           extra-args: >
             --timestamp
