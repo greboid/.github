@@ -13,10 +13,8 @@ on:
         default: 'Dockerfile'
     secrets:
       REG_USER:
-        type: string
         required: false
       REG_PASS:
-        type: string
         required: false
 
 jobs:
