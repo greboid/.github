@@ -52,7 +52,7 @@ jobs:
       - name: Pre-login GHCR
         if: ${{ inputs.preloginghcr }}
         id: pre-login-ghcr
-        uses: redhat-actions/podman-login@v1
+        uses: redhat-actions/podman-login@v1.5
         with:
           registry: 'ghcr.io'
           username: ${{ github.repository_owner }}
@@ -61,7 +61,7 @@ jobs:
       - name: Pre-login Registry
         if: ${{ inputs.preloginreg }}
         id: pre-login-registry
-        uses: redhat-actions/podman-login@v1
+        uses: redhat-actions/podman-login@v1.5
         with:
           registry: ${{ inputs.registry }}
           username: ${{ secrets.REGISTRY_USER }}
