@@ -1,1 +1,21 @@
-checkout-and-test-go.yml
+name: Test
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 'stable'
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test ./...
