@@ -38,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Ensure docker config exists
+        run: mkdir -p ~/.docker && touch ~/.docker/config.json
+
       - name: Checkout
         uses: actions/checkout@v4
 
