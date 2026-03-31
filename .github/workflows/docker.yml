@@ -42,7 +42,7 @@ jobs:
         run: mkdir -p ~/.docker && touch ~/.docker/config.json
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Generate tags
         id: tags
