@@ -85,7 +85,7 @@ jobs:
 
       - name: Push to GHCR
         if: inputs.registry == 'ghcr.io'
-        uses: redhat-actions/push-to-registry@v2.7
+        uses: redhat-actions/push-to-registry@v2.8
         with:
           image: ${{ steps.build-image.outputs.image }}
           registry: ${{ inputs.registry }}
@@ -95,7 +95,7 @@ jobs:
 
       - name: Push to Registry
         if: inputs.registry != 'ghcr.io'
-        uses: redhat-actions/push-to-registry@v2.7
+        uses: redhat-actions/push-to-registry@v2.8
         with:
           image: ${{ steps.build-image.outputs.image }}
           registry: ${{ inputs.registry }}
