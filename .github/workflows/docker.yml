@@ -94,7 +94,7 @@ jobs:
         run: |
           podman login -u '${{ github.repository_owner }}' -p '${{ secrets.GITHUB_TOKEN }}' ghcr.io
           for tag in ${{ steps.tags.outputs.tags }}; do
-            podman push '${{ inputs.registry }}/${{ inputs.image }}:${tag}'
+            podman push "${{ inputs.registry }}/${{ inputs.image }}:${tag}"
           done
 
       - name: Push to Registry
@@ -102,5 +102,5 @@ jobs:
         run: |
           podman login -u '${{ secrets.REGISTRY_USER }}' -p '${{ secrets.REGISTRY_PASS }}' '${{ inputs.registry }}'
           for tag in ${{ steps.outputs.tags }}; do
-            podman push '${{ inputs.registry }}/${{ inputs.image }}:${tag}'
+            podman push "${{ inputs.registry }}/${{ inputs.image }}:${tag}"
           done
