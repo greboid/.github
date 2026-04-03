@@ -52,53 +52,54 @@ jobs:
           fullname: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Validate registry credentials
+        if: inputs.registry != 'ghcr.io'
+        run: |
+          if [[ -z "${{ secrets.REGISTRY_USER }}" ]] || [[ -z "${{ secrets.REGISTRY_PASS }}" ]]; then
+            echo "::error::REGISTRY_USER and REGISTRY_PASS secrets are required when pushing to a non-GHCR registry"
+            exit 1
+          fi
+
       - name: Pre-login GHCR
         if: ${{ inputs.preloginghcr }}
-        id: pre-login-ghcr
-        uses: redhat-actions/podman-login@v1.7
-        with:
-          registry: 'ghcr.io'
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_TOKEN }}
+        run: podman login -u '${{ github.repository_owner }}' -p '${{ secrets.GHCR_TOKEN }}' ghcr.io
 
       - name: Pre-login Registry
         if: ${{ inputs.preloginreg }}
-        id: pre-login-registry
-        uses: redhat-actions/podman-login@v1.7
-        with:
-          registry: ${{ inputs.registry }}
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_PASS }}
+        run: podman login -u '${{ secrets.REGISTRY_USER }}' -p '${{ secrets.REGISTRY_PASS }}' '${{ inputs.registry }}'
 
       - name: Build image
         id: build-image
-        uses: redhat-actions/buildah-build@v2.13
-        with:
-          dockerfiles: ${{ inputs.dockerfile }}
-          image: ${{ inputs.image }}
-          tags: ${{ steps.tags.outputs.tags }}
-          extra-args: >
-            --timestamp
-            0
-          build-args: |
-            ${{ inputs.build-args }}
+        run: |
+          TAG_ARGS=""
+          for tag in ${{ steps.tags.outputs.tags }}; do
+            TAG_ARGS="${TAG_ARGS} -t ${{ inputs.image }}:${tag}"
+          done
+          BUILD_ARGS=""
+          if [[ -n "${{ inputs.build-args }}" ]]; then
+            while IFS= read -r arg; do
+              [[ -n "${arg}" ]] && BUILD_ARGS="${BUILD_ARGS} --build-arg ${arg}"
+            done <<< "${{ inputs.build-args }}"
+          fi
+          buildah bud \
+            -f ${{ inputs.dockerfile }} \
+            ${TAG_ARGS} \
+            --timestamp 0 \
+            ${BUILD_ARGS} \
+            .
 
       - name: Push to GHCR
         if: inputs.registry == 'ghcr.io'
-        uses: redhat-actions/push-to-registry@v2.8
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          registry: ${{ inputs.registry }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          tags: ${{ steps.tags.outputs.tags }}
+        run: |
+          podman login -u '${{ github.repository_owner }}' -p '${{ secrets.GITHUB_TOKEN }}' ghcr.io
+          for tag in ${{ steps.tags.outputs.tags }}; do
+            podman push '${{ inputs.image }}:${tag}' '${{ inputs.registry }}/${{ inputs.image }}:${tag}'
+          done
 
       - name: Push to Registry
         if: inputs.registry != 'ghcr.io'
-        uses: redhat-actions/push-to-registry@v2.8
-        with:
-          image: ${{ steps.build-image.outputs.image }}
-          registry: ${{ inputs.registry }}
-          username: ${{ secrets.REGISTRY_USER }}
-          password: ${{ secrets.REGISTRY_PASS }}
-          tags: ${{ steps.tags.outputs.tags }}
+        run: |
+          podman login -u '${{ secrets.REGISTRY_USER }}' -p '${{ secrets.REGISTRY_PASS }}' '${{ inputs.registry }}'
+          for tag in ${{ steps.tags.outputs.tags }}; do
+            podman push '${{ inputs.image }}:${tag}' '${{ inputs.registry }}/${{ inputs.image }}:${tag}'
+          done
