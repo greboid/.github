@@ -101,6 +101,6 @@ jobs:
         if: inputs.registry != 'ghcr.io'
         run: |
           podman login -u '${{ secrets.REGISTRY_USER }}' -p '${{ secrets.REGISTRY_PASS }}' '${{ inputs.registry }}'
-          for tag in ${{ steps.outputs.tags }}; do
+          for tag in ${{ steps.tags.outputs.tags }}; do
             podman push "${{ inputs.registry }}/${{ inputs.image }}:${tag}"
           done
